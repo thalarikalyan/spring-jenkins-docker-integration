@@ -14,7 +14,7 @@ pipeline{
 
         stage("SCM checkout"){
             steps{
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/thalarikalyan/JRPT_FileDownloadExcelPdf.git']])
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/thalarikalyan/spring-jenkins-docker-integration.git']])
             }
         }
         stage("Build Process"){
