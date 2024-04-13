@@ -37,7 +37,7 @@ pipeline{
                 withCredentials([string(credentialsId: 'docker credentails', variable: 'docker-creds')]) {
                     bat 'docker images' // Print images before tagging
                     bat 'docker login -u thalarikalyan -p %docker-creds%'
-                    bat 'docker push thalarikalyan/spring-docker-jenkinsintegration-application:latest'
+                    bat 'docker push spring-docker-jenkinsintegration-application:latest'
 
 
 }
