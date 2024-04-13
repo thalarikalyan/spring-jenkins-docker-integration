@@ -39,7 +39,8 @@ pipeline{
                     bat 'docker tag spring-docker-cicd thalarikalyan/spring-docker-cicd'
                     bat 'docker images' // Print images after tagging
                     bat 'docker login -u thalarikalyan -p %docker-creds%'
-                    bat 'docker push thalarikalyan/spring-docker-cicd'
+                    bat 'docker push thalarikalyan/spring-docker-jenkinsintegration-application:latest'
+                    bat 'docker push thalarikalyan/mysql:latest'
 
 
 }
