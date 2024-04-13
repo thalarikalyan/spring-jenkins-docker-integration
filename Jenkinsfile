@@ -36,7 +36,8 @@ pipeline{
             steps {
                 withCredentials([string(credentialsId: 'docker credentails', variable: 'docker-creds')]) {
                     bat 'docker login -u thalarikalyan -p %docker-creds%'
-                    bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
+                    bat 'docker tag %IMAGE_NAME%:%IMAGE_TAG% thalarikalyan/%IMAGE_NAME%:%IMAGE_TAG%'
+                    bat 'docker push thalarikalyan/%IMAGE_NAME%:%IMAGE_TAG%'
 
 
 
