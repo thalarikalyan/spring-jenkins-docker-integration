@@ -41,9 +41,18 @@ spec:
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD # Setting Database password from Secret
-              value: root
-            - name: MYSQL_DATABASE # Setting Database password from Secret
-              value: kalyan
+              valueFrom :
+                secretKeyRef :
+                  key : password
+                  name : db-secrets
+
+            - name: MYSQL_DATABASE # Setting Database Name from a 'ConfigMap'
+              valueFrom:
+                configMapKeyRef:
+                  key: dbName
+                  name: db-config
+
+
           ports:
             - containerPort: 3306
               name: mysql
