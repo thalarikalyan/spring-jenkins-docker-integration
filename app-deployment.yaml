@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: springboot-crud-k8s-deployment
+  name: springboot-crud-deployment
 spec:
   selector:
     matchLabels:
       app: springboot-k8s-mysql
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -14,32 +14,46 @@ spec:
     spec:
       containers:
         - name: springboot-crud-k8s
-          image: thalarikalyan/transaction-docker-k8s:1.0
+          image: springboot-crud-mysql-k8s:1.0
           ports:
-            - containerPort: 9292
+            - containerPort: 8080
           env:   # Setting Enviornmental Variables
-              - name: DB_HOST # Setting Database password from Secret
-                value: mysql
-              - name: DB_NAME # Setting Database password from Secret
-                value: kalyan
-              - name: DB_USERNAME # Setting Database password from Secret
-                value: root
-              - name: DB_PASSWORD # Setting Database password from Secret
-                value: root
+            - name: DB_HOST   # Setting Database host address from configMap
+              valueFrom:
+                configMapKeyRef:
+                  key: host
+                  name: db-config
 
+            - name: DB_NAME  # Setting Database name from configMap
+              valueFrom:
+                configMapKeyRef:
+                  key: dbName
+                  name: db-config
+
+            - name: DB_USERNAME  # Setting Database username from Secret
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: db-secrets
+
+            - name: DB_PASSWORD # Setting Database password from Secret
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: db-secrets
 
 ---
 
 apiVersion: v1 # Kubernetes API version
 kind: Service # Kubernetes resource kind we are creating
 metadata: # Metadata of the resource kind we are creating
-  name: springboot-crud-k8s-svc
+  name: springboot-crud-svc
 spec:
   selector:
     app: springboot-k8s-mysql
   ports:
     - protocol: "TCP"
-      port: 9292 # The port that the service is running on in the cluster
-      targetPort: 9292 # The port exposed by the service
+      port: 8080 # The port that the service is running on in the cluster
+      targetPort: 8080 # The port exposed by the service
   type: NodePort # type of the service.
 
