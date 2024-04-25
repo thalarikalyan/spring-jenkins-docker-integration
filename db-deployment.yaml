@@ -1,4 +1,4 @@
-# Define a Persistent Volume Claim (PVC) for MySQL Storage, dynamically provisioned by the cluster
+# Define a Persistent Volume Claim (PVC) for MySQL Storage
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,6 +12,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
 ---
 # Configure Deployment of MySQL server
 apiVersion: apps/v1
@@ -35,8 +36,11 @@ spec:
         tier: database
     spec:
       containers:
-        - image: mysql:5.7
-          name: mysql
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+              name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -48,9 +52,6 @@ spec:
                 configMapKeyRef:
                   key: dbName
                   name: db-config
-          ports:
-            - containerPort: 3306
-              name: mysql
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
@@ -58,6 +59,7 @@ spec:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: mysql-pv-claim
+
 ---
 # Define a Service to Expose MySQL to Other Services
 apiVersion: v1
