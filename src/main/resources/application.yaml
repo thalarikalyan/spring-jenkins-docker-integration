@@ -1,16 +1,21 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST}/${DB_NAME}?useSSL=false
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+
+    url: jdbc:postgresql://postgresql/postgres?useSSL=false
+    username: postgres
+    password: postgres
     hikari:
       initialization-fail-timeout: 0
+      maximum-pool-size: 100
+      minimum-idle: 10
   jpa:
-    database-platform: org.hibernate.dialect.MySQL5Dialect
-    generate-ddl: true
-    show-sql: true
     hibernate:
-      ddl-auto: update
-server:
-  port: 9292
+      ddl-auto: none
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show-sql: true
