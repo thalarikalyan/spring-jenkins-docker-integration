@@ -1,79 +1,59 @@
-# Define a Persistent Volume Claim (PVC) for MySQL Storage
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pv-claim
-  labels:
-    app: mysql
-    tier: database
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-
----
-# Configure Deployment of MySQL server
+# Configure 'Deployment' of PostgreSQL server
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: postgresql
   labels:
-    app: mysql
+    app: postgresql
     tier: database
 spec:
-  selector:
+  selector: # PostgreSQL Pod Should contain same labels
     matchLabels:
-      app: mysql
+      app: postgresql
       tier: database
   strategy:
     type: Recreate
   template:
     metadata:
-      labels:
-        app: mysql
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: postgresql
         tier: database
     spec:
       containers:
-        - name: mysql
-          image: mysql:5.7
-          ports:
-            - containerPort: 3306
-              name: mysql
+        - image: postgres:latest # image from Docker Hub
+          name: postgresql
           env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: password
-                  name: db-secrets
-            - name: MYSQL_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  key: dbName
-                  name: db-config
-          volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
+            - name: POSTGRES_DB # Setting Database Name from a 'ConfigMap'
+              value: Kalyan
+                
+            - name: POSTGRES_PASSWORD # Setting Database password from Secret
+              value : postgres
+
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          volumeMounts:        # Mounting emptyDir volume
+            - name: postgresql-persistent-storage
+              mountPath: /var/lib/postgresql/data # This is the path in the container on which the mounting will take place.
+
       volumes:
-        - name: mysql-persistent-storage
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim
+        - name: postgresql-persistent-storage # Using emptyDir volume
+          emptyDir: {}
 
 ---
-# Define a Service to Expose MySQL to Other Services
+# Define a 'Service' To Expose PostgreSQL to Other Services
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: postgresql  # DNS name
   labels:
-    app: mysql
+    app: postgresql
     tier: database
 spec:
   ports:
-    - port: 3306
-      targetPort: 3306
-  selector:
-    app: mysql
+    - port: 5432
+      targetPort: 5432
+  selector:       # PostgreSQL Pod Should contain same labels
+    app: postgresql
     tier: database
-  clusterIP: None
+  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant
