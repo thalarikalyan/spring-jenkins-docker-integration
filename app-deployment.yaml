@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: springboot-crud-k8s
-          image: transactionservice:1.0
+          image: thalarikalyan/transactionservice:1.0
           ports:
             - containerPort: 8080
           env:   # Setting Environmental Variables
