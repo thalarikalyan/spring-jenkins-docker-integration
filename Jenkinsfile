@@ -28,7 +28,9 @@ pipeline{
         stage("Build Docker Image and Container") {
             steps {
                 script {
-                    bat 'docker-compose up -d'
+                    bat 'docker build -t transactionservice:1.0 .'
+                    bat 'docker tag transactionservice:1.0 thalarikalyan/transactionservice:1.0'
+                    bat 'docker images'
                 }
             }
         }
@@ -37,13 +39,26 @@ pipeline{
                 withCredentials([string(credentialsId: 'docker credentails', variable: 'docker-creds')]) {
                     bat 'docker images' // Print images before tagging
                     bat 'docker login -u thalarikalyan -p %docker-creds%'
-                    bat 'docker tag spring-docker-jenkinsintegration-application:latest thalarikalyan/spring-docker-jenkinsintegration-application:latest'
-                    bat 'docker push thalarikalyan/spring-docker-jenkinsintegration-application:latest'
-
-
-
-
+                    bat 'docker push thalarikalyan/transactionservice:1.0'
 }
+            }
+        }
+        stage("Deploy Docker Image to Kubernetes") {
+            steps {
+
+                script{
+                    // Use the kubeconfig step to configure kubectl with Kubernetes credentials
+                kubeconfig(credentialsId: 'k8supdatedcred', serverUrl: 'https://127.0.0.1:51265') {
+                
+                 bat 'kubectl apply -f db-deployment.yaml'
+                  bat 'kubectl apply -f app-deployment.yaml'
+                }
+            }
+
+
+
+
+
             }
         }
 
